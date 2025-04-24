@@ -5,146 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Badminton Camp Registration</title>
   <style>
-    body {
-      background-color: #80EF80;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    form {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 500px;
-      margin: auto;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-    }
-    .logo {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .submit-btn {
-      background: #333;
-      color: white;
-      padding: 10px;
-      margin-top: 20px;
-      border: none;
-      cursor: pointer;
-      width: 100%;
-    }
+    /* Your CSS styles */
   </style>
 </head>
 <body>
-  <form id="registrationForm">
-    <div class="logo">
-      <img src="your-logo-url-here.png" alt="Logo" width="120"/>
-    </div>
+  <form id="registrationForm" enctype="multipart/form-data">
+    <!-- Your form fields go here -->
     <label>Last Name:</label>
     <input type="text" name="LastName" required />
-
     <label>First Name:</label>
     <input type="text" name="FirstName" required />
-
     <label>Age:</label>
     <input type="number" name="Age" required />
-
     <label>Home Address:</label>
     <textarea name="Address" required></textarea>
-
     <label>Skill Level:</label>
     <select name="SkillLevel" required>
-      <option>Beginner (first time playing badminton)</option>
-      <option>Advanced Beginner (basic knowledge)</option>
+      <option>Beginner</option>
+      <option>Advanced Beginner</option>
       <option>Intermediate</option>
       <option>Advanced</option>
     </select>
-
     <label>Court Venue:</label>
     <input type="text" value="Epicenter" name="Venue" readonly />
-
-    <label>Gcash Payment:</label>
-    <p>Send payment to <strong>09072817395</strong></p>
-
     <label>Upload Proof of Payment:</label>
     <input type="file" name="PaymentProof" id="paymentProof" required />
-
     <label>
       <input type="checkbox" name="terms" required />
       I accept the terms and conditions.
     </label>
     <details>
       <summary>Read Terms and Conditions</summary>
-      <pre style="white-space: pre-wrap;">
-1. Registration and Payment
-All participants must complete...
-[Insert the full T&C here for brevity]
-      </pre>
+      <pre>1. Registration and Payment...</pre>
     </details>
-
     <button type="submit" class="submit-btn">Submit</button>
   </form>
 
   <script>
-  const form = document.getElementById('regForm');
+    const form = document.getElementById('registrationForm');
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
 
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
+      const fileInput = document.getElementById('paymentProof');
+      const termsAccepted = document.querySelector('input[name="terms"]').checked;
 
-    const fileInput = document.getElementById('paymentProof');
-    const termsAccepted = document.getElementById('agreeTerms').checked;
-
-    if (!fileInput.files.length) {
-      alert("Please upload proof of payment.");
-      return;
-    }
-    if (!termsAccepted) {
-      alert("You must accept the terms and conditions.");
-      return;
-    }
-
-    // Grab all the form data
-    const data = {
-      lastName: form.lastName.value,
-      firstName: form.firstName.value,
-      age: form.age.value,
-      address: form.address.value,
-      skill: form.skill.value,
-      venue: form.venue.value,
-      paymentRef: "Uploaded", // We're just noting that payment proof was uploaded
-    };
-
-    // Replace with your real Web App URL
-    const scriptURL = "https://script.google.com/macros/s/AKfycbx_TrKh1_DKSmpnf48qRCf92Ry4mMiTAnKJLjS9X9U9kIZI4fvikNGwE7kVMaMzXCpvbw/exec";
-
-    try {
-      const response = await fetch(scriptURL, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-
-      if (response.ok) {
-        alert("Registration submitted successfully!");
-        form.reset(); // Clear form after submission
-      } else {
-        alert("There was an error submitting the form.");
+      // Ensure the user uploads a payment proof
+      if (!fileInput.files.length) {
+        alert("Please upload proof of payment.");
+        return;
       }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Submission failed. Please try again.");
-    }
-  });
-</script>
 
+      // Ensure the user accepts the terms and conditions
+      if (!termsAccepted) {
+        alert("You must accept the terms and conditions.");
+        return;
+      }
+
+      // Collect form data and append the file to FormData object
+      const formData = new FormData();
+      formData.append("LastName", form.elements["LastName"].value);
+      formData.append("FirstName", form.elements["FirstName"].value);
+      formData.append("Age", form.elements["Age"].value);
+      formData.append("Address", form.elements["Address"].value);
+      formData.append("SkillLevel", form.elements["SkillLevel"].value);
+      formData.append("Venue", form.elements["Venue"].value);
+      formData.append("PaymentProof", fileInput.files[0]); // Append the file
+
+      const scriptURL = "https://script.google.com/macros/s/AKfycbx_TrKh1_DKSmpnf48qRCf92Ry4mMiTAnKJLjS9X9U9kIZI4fvikNGwE7kVMaMzXCpvbw/exec";
+
+      try {
+        // Send formData (not JSON) to the server
+        const response = await fetch(scriptURL, {
+          method: "POST",
+          body: formData
+        });
+
+        if (response.ok) {
+          alert("Registration submitted successfully!");
+          form.reset(); // Reset the form
+        } else {
+          alert("There was an error submitting the form.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Submission failed. Please try again.");
+      }
+    });
+  </script>
 </body>
 </html>

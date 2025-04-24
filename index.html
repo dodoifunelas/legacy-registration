@@ -10,87 +10,77 @@
 </head>
 <body>
   <form id="registrationForm" enctype="multipart/form-data">
-    <!-- Your form fields go here -->
-    <label>Last Name:</label>
-    <input type="text" name="LastName" required />
-    <label>First Name:</label>
-    <input type="text" name="FirstName" required />
-    <label>Age:</label>
-    <input type="number" name="Age" required />
-    <label>Home Address:</label>
-    <textarea name="Address" required></textarea>
-    <label>Skill Level:</label>
-    <select name="SkillLevel" required>
-      <option>Beginner</option>
-      <option>Advanced Beginner</option>
-      <option>Intermediate</option>
-      <option>Advanced</option>
-    </select>
-    <label>Court Venue:</label>
-    <input type="text" value="Epicenter" name="Venue" readonly />
-    <label>Upload Proof of Payment:</label>
-    <input type="file" name="PaymentProof" id="paymentProof" required />
-    <label>
-      <input type="checkbox" name="terms" required />
-      I accept the terms and conditions.
-    </label>
-    <details>
-      <summary>Read Terms and Conditions</summary>
-      <pre>1. Registration and Payment...</pre>
-    </details>
-    <button type="submit" class="submit-btn">Submit</button>
-  </form>
+  <!-- Your other fields here -->
+  
+  <label>Last Name:</label>
+  <input type="text" name="LastName" required />
 
-  <script>
-    const form = document.getElementById('registrationForm');
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
+  <label>First Name:</label>
+  <input type="text" name="FirstName" required />
 
-      const fileInput = document.getElementById('paymentProof');
-      const termsAccepted = document.querySelector('input[name="terms"]').checked;
+  <!-- Other fields -->
 
-      // Ensure the user uploads a payment proof
-      if (!fileInput.files.length) {
-        alert("Please upload proof of payment.");
-        return;
+  <label>Upload Proof of Payment:</label>
+  <input type="file" name="PaymentProof" id="paymentProof" required />
+
+  <!-- Terms and Conditions checkbox -->
+  <label>
+    <input type="checkbox" name="terms" required />
+    I accept the terms and conditions.
+  </label>
+
+  <button type="submit" class="submit-btn">Submit</button>
+</form>
+
+<script>
+  const form = document.getElementById('registrationForm');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const fileInput = document.getElementById('paymentProof');
+    const termsAccepted = document.querySelector('input[name="terms"]').checked;
+
+    // Ensure the user uploads a payment proof
+    if (!fileInput.files.length) {
+      alert("Please upload proof of payment.");
+      return;
+    }
+
+    // Ensure the user accepts the terms and conditions
+    if (!termsAccepted) {
+      alert("You must accept the terms and conditions.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("LastName", form.elements["LastName"].value);
+    formData.append("FirstName", form.elements["FirstName"].value);
+    formData.append("Age", form.elements["Age"].value);
+    formData.append("Address", form.elements["Address"].value);
+    formData.append("SkillLevel", form.elements["SkillLevel"].value);
+    formData.append("Venue", form.elements["Venue"].value);
+    formData.append("PaymentProof", fileInput.files[0]);  // Append the file
+
+    const scriptURL = "https://script.google.com/macros/s/AKfycbx_TrKh1_DKSmpnf48qRCf92Ry4mMiTAnKJLjS9X9U9kIZI4fvikNGwE7kVMaMzXCpvbw/exec";
+
+    try {
+      const response = await fetch(scriptURL, {
+        method: "POST",
+        body: formData
+      });
+
+      if (response.ok) {
+        alert("Registration submitted successfully!");
+        form.reset();  // Reset the form
+      } else {
+        alert("There was an error submitting the form.");
       }
-
-      // Ensure the user accepts the terms and conditions
-      if (!termsAccepted) {
-        alert("You must accept the terms and conditions.");
-        return;
-      }
-
-      // Collect form data and append the file to FormData object
-      const formData = new FormData();
-      formData.append("LastName", form.elements["LastName"].value);
-      formData.append("FirstName", form.elements["FirstName"].value);
-      formData.append("Age", form.elements["Age"].value);
-      formData.append("Address", form.elements["Address"].value);
-      formData.append("SkillLevel", form.elements["SkillLevel"].value);
-      formData.append("Venue", form.elements["Venue"].value);
-      formData.append("PaymentProof", fileInput.files[0]); // Append the file
-
-      const scriptURL = "https://script.google.com/macros/s/AKfycbx_TrKh1_DKSmpnf48qRCf92Ry4mMiTAnKJLjS9X9U9kIZI4fvikNGwE7kVMaMzXCpvbw/exec";
-
-      try {
-        // Send formData (not JSON) to the server
-        const response = await fetch(scriptURL, {
-          method: "POST",
-          body: formData
-        });
-
-        if (response.ok) {
-          alert("Registration submitted successfully!");
-          form.reset(); // Reset the form
-        } else {
-          alert("There was an error submitting the form.");
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Submission failed. Please try again.");
-      }
-    });
-  </script>
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Submission failed. Please try again.");
+    }
+  });
+</script>
 </body>
 </html>
